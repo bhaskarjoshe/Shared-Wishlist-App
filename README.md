@@ -1,4 +1,4 @@
-# flockShop.ai
+# Shared Wishlist App
 
 A full-stack web application for managing shared wishlists, built with a React + Vite + Tailwind frontend and an Express + PostgreSQL backend.
 
@@ -7,7 +7,7 @@ A full-stack web application for managing shared wishlists, built with a React +
 ## Project Structure
 
 ```
-flockShop.ai/
+shared-wishlist-app/
   client/    # Frontend (React, Vite, TailwindCSS, TypeScript)
   server/    # Backend (Node.js, Express, PostgreSQL)
 ```
