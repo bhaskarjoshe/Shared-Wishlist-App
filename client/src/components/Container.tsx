@@ -5,7 +5,7 @@ interface ContainerProps{
 
 const Container = ({children}: ContainerProps) => {
   return (
-    <div>
+    <div className="mx-[20%] my-10 flex items-center justify-center">
         {children}
     </div>
   )

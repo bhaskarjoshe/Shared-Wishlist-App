@@ -1,8 +1,8 @@
 
 const Header = () => {
   return (
-    <div>
-
+    <div className="text-center text-3xl py-4 shadow-md">
+      Shared Wishlist
     </div>
   )
 }

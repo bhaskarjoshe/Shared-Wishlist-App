@@ -13,22 +13,29 @@ const signUp = async (req, res) => {
         .json({ message: "username or password is missing" });
     }
 
-    const userCheck = await pool.query(
+    const user = await pool.query(
       "SELECT id FROM users WHERE username=$1",
       [username]
     );
-    if (userCheck.rows.length > 0) {
+    if (user.rows.length > 0) {
       return res.status(409).json({ message: "user already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await pool.query("INSERT INTO users(username, password) VALUES($1, $2)", [
+    const insertResult = await pool.query("INSERT INTO users(username, password) VALUES($1, $2) RETURNING id", [
       username,
       hashedPassword,
     ]);
 
+    const userID = insertResult.rows[0].id
+    console.log(userID)
+
+    const token = jwt.sign({ id: userID }, process.env.JWT_SECRET, {
+      expiresIn: "2h",
+    });
+
     logger.info(`User registered: ${username}`);
-    return res.status(201).json({ message: "user registered successfully" });
+    return res.status(201).json({ message: "user registered successfully" , token});
   } catch (error) {
     logger.error("SignUp error:", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -67,5 +74,7 @@ const signIn = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
 
 export { signUp, signIn };
