@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
 import { pool } from "../config/db.js";
 import logger from "../config/logger.js";
+import jwt from "jsonwebtoken"
+
 
 const signUp = async (req, res) => {
   try {
@@ -41,22 +43,25 @@ const signIn = async (req, res) => {
         .status(400)
         .json({ message: "username or password is missing" });
     }
-    const userCheck = await pool.query(
-      "SELECT username,password FROM users WHERE username=$1",
+    const user = await pool.query(
+      "SELECT id,username,password FROM users WHERE username=$1",
       [username]
     );
-    if (userCheck.rows.length === 0) {
+    if (user.rows.length === 0) {
       return res.status(404).json({ message: "user doesn't exist" });
     }
 
-    const hashedPassword = userCheck.rows[0].password;
+    const hashedPassword = user.rows[0].password;
     const isMatch = await bcrypt.compare(password, hashedPassword);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
+    const token = jwt.sign({ id: user.rows[0].id }, process.env.JWT_SECRET, {
+      expiresIn: "2h",
+    });
 
     logger.info(`User signed in: ${username}`);
-    return res.status(200).json({ message: "user sign in successful" });
+    return res.status(200).json({ message: "user sign in successful", token });
   } catch (error) {
     logger.error("SignIn error:", error);
     return res.status(500).json({ message: "Internal server error" });
